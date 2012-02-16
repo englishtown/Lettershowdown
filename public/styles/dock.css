@@ -1,0 +1,204 @@
+@charset "UTF-8";
+/* CSS Document */
+
+@font-face 
+{
+	font-family: 'DIN1451StdEngschrift';
+	src: url('dinengschriftstd-webfont.eot');
+	src: url('dinengschriftstd-webfont.eot?#iefix') format('embedded-opentype'),
+		 url('dinengschriftstd-webfont.woff') format('woff'),
+		 url('dinengschriftstd-webfont.ttf') format('truetype'),
+		 url('dinengschriftstd-webfont.svg#DIN1451StdEngschrift') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+#dock
+{
+	height:150px;
+	width:100%;
+}
+
+#letters
+{
+	float:left;
+	width:700px;
+	background-color:#ffffff;
+	border-bottom:solid 1px #e3e3e3;
+}
+
+/* 
+Drag and drop block
+--------------------------------------------
+*/
+.ddBlock
+{
+	width:40px;
+	height:40px;
+	border: solid 1px #e3e3e3;
+	float:left;
+	margin:0 5px 5px 0;
+	background-color:#0CF;
+	opacity:.75;
+	
+	-moz-box-shadow: 0px 0px 8px #888;
+	-webkit-box-shadow: 0px 0px 8px #888;
+	box-shadow: 0px 0px 8px #888;
+}
+.ddBlock p
+{
+	font-family:'DIN1451StdEngschrift', Arial, Helvetica, sans-serif;
+	font-size:30px;
+	text-align:center;
+	padding:0 0 0 0;
+	margin:1px 0;
+	opacity:.5;
+}
+
+/* 
+Ammunition dock
+--------------------------------------------
+*/
+#ammoDockContainer
+{
+	width:700px;
+	height:49px;
+	padding:0;
+	margin:0;
+	border-bottom:solid 1px #e3e3e3;
+	background-color:#ffffff;
+	overflow:hidden;	
+}
+#ammoDock
+{
+	list-style-type:none;
+	padding:3px;
+	margin:0;
+	height:49px;	
+}
+#ammoDock li
+{
+	width:40px;
+	height:40px;
+	border: solid 1px #e3e3e3;
+	float:left;
+	margin:0 5px 5px 0;
+}
+#ammoDock li p
+{
+	font-family:'DIN1451StdEngschrift', Arial, Helvetica, sans-serif;
+	font-size:30px;
+	text-align:center;
+	padding:0 0 0 0;
+	margin:2px 0;
+	opacity:.65;
+}
+
+/* 
+Letter dock
+--------------------------------------------
+*/
+#letterDock
+{
+	list-style-type:none;
+	padding:0;
+	margin:0;
+	width:664px;
+	height:58px;
+	margin:20px;
+}
+
+#letterDock li
+{
+	width:60px;
+	height:60px;
+	border: solid 1px #000;
+	
+	float:left;
+	
+	margin:0 5px 0 0;
+}
+
+#letterDock li .placeholder
+{
+	width:60px;
+	height:60px;
+	border:dashed 1px #000000;
+	
+	float:left;
+	
+	margin:0 5px 0 0;
+}
+
+#letterDock li p
+{
+	font-family:'DIN1451StdEngschrift', Arial, Helvetica, sans-serif;
+	font-size:40px;
+	text-align:center;
+	padding:0 0 0 0;
+	margin:7px 0;
+	opacity:.65;
+}
+
+.correct
+{
+	background-color:#A3CE59;
+}
+.uncorrect
+{
+	background-color:#F68B1F;
+}
+
+.letterBox
+{
+	width:60px;
+	height:60px;
+	border: solid 1px #000;
+}
+.letterBox .l
+{
+	font-family:'DIN1451StdEngschrift', Arial, Helvetica, sans-serif;
+	font-size:40px;
+	text-align:center;
+	padding:6px 0 0 0;
+}
+
+#lInfoBox
+{
+	float:left;
+	width:158px;
+	height:148px;
+	border-right:solid 1px #e3e3e3;
+	border-left:solid 1px #e3e3e3;
+	border-bottom:solid 1px #e3e3e3;
+}
+
+#lInfoBox img
+{
+	width:148px;
+	height:138px;
+	margin:5px;
+	border:0;
+}
+
+#rInfoBox
+{
+	float:left;
+	width:158px;
+	height:148px;
+	border-right:solid 1px #e3e3e3;
+	border-left:solid 1px #e3e3e3;
+	border-bottom:solid 1px #e3e3e3;
+}
+
+#clock
+{
+	font-family:'DIN1451StdEngschrift', Arial, Helvetica, sans-serif;
+	font-size:40px;
+	text-align:center;
+	padding:0;
+	margin:7px 0;
+}
+
+
+

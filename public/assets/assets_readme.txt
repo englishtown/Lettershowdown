@@ -1,0 +1,1 @@
+For testing purposes, assets are hosted remotely on chrometaphore.com.

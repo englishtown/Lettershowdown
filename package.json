@@ -1,0 +1,9 @@
+{
+  "name": "heroku_lettershowdown",
+  "version": "0.0.2",
+  "dependencies": {
+    "express": "2.2.0",
+    "socket.io": "0.8.7",
+	"paperboy": "0.0.3"
+  }
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Lettershowdown Alpha 0.1.1</title>
+
+<link rel="icon" 
+      type="image/png" 
+      href="http://www.chrometaphore.com/EF/Games/prototypes/lettershowdown/assets/main/favicon.png">
+
+<!-- CSS -->
+<style type="text/css">
+	@import "js/jquery_svg/jquery.svg.css";
+	@import "styles/dock.css";
+	@import "styles/main.css";
+</style>
+
+<!-- JS -->
+<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
+
+<script type="text/javascript" src="js/jquery.dragsort.js"></script>
+<script type="text/javascript" src="js/jquery_svg/jquery.svg.min.js"></script>
+<script type="text/javascript" src="js/jquery_svg/jquery.svganim.min.js"></script>
+<script type="text/javascript" src="js/modernizr.js"></script>
+
+<script type="text/javascript" src="js/lib.js"></script>
+<script type="text/javascript" src="js/quiz.js"></script>
+<script type="text/javascript" src="js/randomBox.js"></script>
+<script type="text/javascript" src="js/dock.js"></script>
+<script type="text/javascript" src="js/player.js"></script>
+
+<script type="text/javascript" src="js/gameItems.js"></script>
+<script type="text/javascript" src="js/interactions.js"></script>
+<script type="text/javascript" src="js/collisions.js"></script>
+<script type="text/javascript" src="js/tilesEngine.js"></script>
+<script type="text/javascript" src="js/socket.js"></script>
+<script type="text/javascript" src="js/gameViewPort.js"></script>
+<script type="text/javascript" src="js/bullet.js"></script>
+<script type="text/javascript" src="js/math.js"></script>
+<script type="text/javascript" src="js/IDBuilder.js"></script>
+
+<script type="text/javascript" src="js/main.js"></script>
+
+
+<!-- if this is multiplayer hosted and runned via node.js we can directly link like this
+<script src="/socket.io/socket.io.js"></script> -->
+
+<!-- websocket library is compiled by node.js here  -->
+<script src="http://lettershowdown.herokuapp.com/socket.io/socket.io.js"></script>
+
+<!-- if localhost node testing. 
+<script src="http://localhost:14584/socket.io/socket.io.js"></script>-->
+
+
+</head>
+
+<body>
+
+	<div id="eventDispatcher"></div>
+		
+	<div id="game">
+		
+		<!-- game viewport (svg) -->
+		<div id="viewport"></div>
+		
+		<!-- letter dock -->
+		<div id="dock">
+    
+            <div id="lInfoBox">
+            	<img src="assets/lib/butterfly.jpg" />
+            </div>
+            
+            <div id="letters">
+            	<div id ="ammoDockContainer">
+                    <ul id="ammoDock">
+                    </ul>
+                </div>
+                <ul id="letterDock">
+                </ul>
+            </div>
+            
+            <div id="rInfoBox">
+            	<div id="clock">0:30</div>
+            </div>
+            
+        </div>
+	</div>
+</body>
+</html>

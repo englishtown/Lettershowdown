@@ -1,0 +1,31 @@
+#core
+{
+	display:none;
+	width:0px;
+	height:0px;
+}
+
+#eventDispatcher 
+{ 
+	width: 0px; 
+	height: 0px; 
+	display:none;
+}
+
+body
+{
+	margin:0 auto;
+}
+
+#game
+{
+	width:1020px;
+	height:600px;
+}
+
+#viewport 
+{ 
+	width: 1020px; 
+	height: 440px;  
+	background-image:url(http://www.chrometaphore.com/EF/Games/prototypes/lettershowdown/assets/tile.png);
+}
