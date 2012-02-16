@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>Lettershowdown Alpha 0.1.2</title>
+<title>Lettershowdown Alpha 0.1.3</title>
 
 <link rel="icon" 
       type="image/png" 
@@ -13,6 +13,7 @@
 	@import "js/jquery_svg/jquery.svg.css";
 	@import "styles/dock.css";
 	@import "styles/main.css";
+	@import "styles/tooltip.css";
 </style>
 
 <!-- JS -->
@@ -39,15 +40,16 @@
 <script type="text/javascript" src="js/bullet.js"></script>
 <script type="text/javascript" src="js/math.js"></script>
 <script type="text/javascript" src="js/IDBuilder.js"></script>
+<script type="text/javascript" src="js/tooltips.js"></script>
 
 <script type="text/javascript" src="js/main.js"></script>
 
 
-<!-- if this is multiplayer hosted and runned via node.js we can directly link like this
-<script src="/socket.io/socket.io.js"></script> -->
+<!-- if this is multiplayer hosted and runned via node.js we can directly link like this-->
+<script src="/socket.io/socket.io.js"></script> 
 
-<!-- websocket library is compiled by node.js here  -->
-<script src="http://lettershowdown.herokuapp.com/socket.io/socket.io.js"></script>
+<!-- websocket library is compiled by node.js here  
+<script src="http://lettershowdown.herokuapp.com/socket.io/socket.io.js"></script>-->
 
 <!-- if localhost node testing. 
 <script src="http://localhost:14584/socket.io/socket.io.js"></script>-->
@@ -68,7 +70,7 @@
 		<div id="dock">
     
             <div id="lInfoBox">
-            	<img src="assets/lib/butterfly.jpg" />
+            	<img src="" alt="what is this?" />
             </div>
             
             <div id="letters">

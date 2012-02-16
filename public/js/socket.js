@@ -4,7 +4,7 @@ var mySID;
 function socket_connect() 
 {
 	//local test
-	//socket = io.connect('http://localhost');
+	socket = io.connect('http://localhost');
 	
 	//local ws test (working)
 	//socket = io.connect( 'http://localhost', {port:14584, rememberTransport: false} );
@@ -12,8 +12,8 @@ function socket_connect()
 	//nodester (working)
 	//socket = io.connect( null, {port:80, rememberTransport: false} );
 	
-	//heroku
-	socket = io.connect( null, {port:80} );
+	//heroku (working)
+	//socket = io.connect( null, {port:80} );
 	
 	//nodester ws test. (working)
 	//socket = io.connect( 'http://lettershowdown.nodester.com/', {port:80, rememberTransport: false} );

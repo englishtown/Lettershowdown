@@ -160,11 +160,13 @@ function duplicateItem4Socket( clientID )
 	ItemDuplicate.ypos  = items[itemN].ypos;
 	ItemDuplicate.tiles = items[itemN].tiles;
 	ItemDuplicate.color = items[itemN].color;
+	ItemDuplicate.name  = items[itemN].name;
+	ItemDuplicate.score = items[itemN].score;
 	
 	return ItemDuplicate;
 }
 
-function buildPlayer( id, xtile, ytile, color )
+function buildPlayer( id, xtile, ytile, color, name, score )
 {
 	var player = {};
 	
@@ -194,8 +196,16 @@ function buildPlayer( id, xtile, ytile, color )
 	player.ypos  = ypos;
 	player.tiles = blockTiles;
 	player.color = color;
+	player.name  = name;
+	player.score = score;
 	
 	items.push( player );
+	
+	//add a tooltip for this player
+	var t = gameTooltips.add( id );
+	
+	//initial positioning
+	t.position( xpos, ypos );
 	
 	return player;
 }
@@ -230,7 +240,7 @@ function removePlayer( id )
 	items.splice( playerArrN, 1 );
 }
 
-function buildClient( id, xtile, ytile )
+function buildClient( id, xtile, ytile, color, name, score )
 {
 	var client = {};
 	
@@ -244,10 +254,10 @@ function buildClient( id, xtile, ytile )
 						   ypos, 
 						   PLAYER_W, 
 						   PLAYER_H, 
-						   {fill:clientColor, stroke: "#ffe400", strokeWidth: 1});
+						   {fill:color, stroke: "#ffe400", strokeWidth: 1});
 	
 	avatar.move = function( x, y )
-	{				 
+	{					 
 		$(this).animate( { svgX:x, svgY:y }, 
 						 100,
 						 onAvatarMove );	
@@ -268,9 +278,17 @@ function buildClient( id, xtile, ytile )
 	client.xpos  = xpos;
 	client.ypos  = ypos;
 	client.tiles = blockTiles;
-	client.color = clientColor;
+	client.color = color;
+	client.name  = name;
+	client.score = score;
 	
 	items.push( client );
+	
+	//add a tooltip for my client
+	var t = gameTooltips.add( id );
+	
+	//initial positioning
+	t.position( xpos, ypos );
 	
 	return client;
 }

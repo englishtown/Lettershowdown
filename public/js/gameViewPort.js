@@ -17,6 +17,9 @@ function initGameViewPort()
 		//update client color.
 		clientColor = params.color;
 		
+		//update my client SID
+		clientID = params.mySID;
+		
 		console.log("Building pre-existing game situation...");
 		console.log("---------------------------------------");
 		
@@ -30,7 +33,9 @@ function initGameViewPort()
 				buildPlayer( params.items[i].id, 
 				             getTileX( params.items[i].xpos ), 
 							 getTileY( params.items[i].ypos ),
-							 params.items[i].color );
+							 params.items[i].color,
+							 params.items[i].name,
+							 params.items[i].score );
 			}
 			else if ( params.items[i].type == "block" )
 			{
@@ -42,10 +47,16 @@ function initGameViewPort()
 			}
 		}
 		
-		//create my client
-		clientID = params.mySID;
+		//generate spawn point
 		var mySpawnPoint = generateTileSpawnPoint();
-		var myClient     = buildClient( clientID, mySpawnPoint[0], mySpawnPoint[1] );
+		
+		//create my client avatar
+		var myClient     = buildClient( clientID, 
+		                                mySpawnPoint[0], 
+										mySpawnPoint[1],
+										clientColor,
+										temp.name,
+										0 );
 		
 		//tell socket to spawn my client ( strips item ref to keep the socket comunication lighter )
 		socket_client_spawn( { Item:duplicateItem4Socket( clientID) } );
@@ -58,7 +69,9 @@ function initGameViewPort()
 		buildPlayer( params.Item.id, 
 			         getTileX( params.Item.xpos ), 
 				     getTileY( params.Item.ypos ),
-				     params.Item.color );
+				     params.Item.color,
+					 params.Item.name,
+					 params.Item.score );
 	});
 	
 	//on user x avatar interaction
@@ -77,6 +90,13 @@ function initGameViewPort()
 				
 				//animate avatar
 				items[ thisUserID ].ref.move( params.xpos, params.ypos );
+				
+				//move user tooltip
+				var myTooltip = gameTooltips.getByPlayerID(params.id);
+				if ( myTooltip.found )
+				{
+					myTooltip.ref.position( params.xpos, params.ypos );
+				}
 			break;
 			
 			case "shoot":
@@ -109,8 +129,6 @@ function initGameViewPort()
 
 function tick()
 {
-	
-	
 	if ( mouseDown.action == "dragAmmo" )
 	{
 		//dragging ammo functions here. 
@@ -268,6 +286,14 @@ function tick()
 					
 					//move player
 					items[clientN].ref.move( items[clientN].xpos, items[clientN].ypos );
+					
+					//move client tooltip
+					var myTooltip = gameTooltips.getByPlayerID(clientID);
+					if ( myTooltip.found )
+					{
+						myTooltip.ref.position( items[clientN].xpos, items[clientN].ypos );
+					}
+					
 				}
 				else
 				{

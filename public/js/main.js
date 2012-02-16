@@ -47,6 +47,9 @@ var dragLine;
 //me --> player()
 var ME;
 
+//tooltips
+var gameTooltips = new tooltips();
+
 function clearDragLine()
 {
 	if ( dragLine != undefined && dragLine != null )
@@ -144,7 +147,7 @@ $(function()
 		ME = new player( temp.name, clientID, clientColor );
 		
 		//local single player testing here
-		var client = buildClient( clientID, 5, 5, clientColor );
+		var client = buildClient( clientID, 5, 5, ME.color, ME.name, ME.score );
 		
 		/*
 		buildBlock( 2, 2, clientID );
