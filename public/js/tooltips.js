@@ -6,7 +6,7 @@ function tooltip( playerID )
 	var playerN = getItemNById( playerID );
 		
 	//append html
-	$("#viewport").append("<div id=\"" + this.ID + "\" class=\"tooltip\">" + items[playerN].name + "</div>");
+	$("#viewport").append("<div id=\"" + this.ID + "\" class=\"tooltip\">" + items[playerN].name + "<br />score: " + items[playerN].score + "</div>");
 	
 	//PUBLIC
 	//----------------------------------------------------------------------
@@ -15,6 +15,12 @@ function tooltip( playerID )
 	{
 		$( "#" + this.ID ).css( "top", ypos );
 		$( "#" + this.ID ).css( "left", xpos );
+	}
+	
+	this.updateScore = function( score )
+	{
+		var playerN = getItemNById( this.playerID );
+		$("#" + this.ID).html( items[playerN].name + "<br />score: " + score );
 	}
 }
 
@@ -25,6 +31,12 @@ function tooltips()
 	//PUBLIC
 	//----------------------------------------------------------------------
 	
+	this.get = function( playerID )
+	{
+		var myTooltip = this.getByPlayerID(playerID).ref;
+		return myTooltip;
+	}
+	
 	this.add = function( playerID )
 	{
 		var t = new tooltip( playerID );
@@ -32,10 +44,27 @@ function tooltips()
 		return t;
 	}
 	
+	this.remove = function( playerID )
+	{
+		//get correct tooltip from the array
+		var myTooltip = this.getByPlayerID(playerID);
+		
+		//remove div
+		$("#" + myTooltip.ref.ID).remove();
+		
+		//garbage collection
+		_tooltips.ref = {};
+		
+		//remove tooltip entry from the array
+		_tooltips.splice( myTooltip.n, 1 );
+		
+	}
+	
 	this.getByPlayerID = function( playerID )
 	{
 		var myTooltip   = {};
 		myTooltip.found = false;
+		myTooltip.n     = -1;
 		for ( var i = 0; i < _tooltips.length; i++ )
 		{
 			if ( playerID == _tooltips[i].playerID )
@@ -43,6 +72,7 @@ function tooltips()
 				myTooltip.ref        = _tooltips[i].ref;
 				myTooltip.playerID   = _tooltips[i].playerID;
 				myTooltip.found      = true;
+				myTooltip.n          = i;
 				break;
 			}
 		}

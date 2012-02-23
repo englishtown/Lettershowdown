@@ -93,11 +93,28 @@ function buildDockWord( wordToBuild )
 {
 	var rbox = new randomBox( wordToBuild.length );
 	
+	var shuffledWord = "";
+	
 	for ( var i = 0; i < wordToBuild.length; i++ )
 	{
-		//alert( rbox.pickRandom() );
-		$(letterDockID).append( "<li><p class=\"l\">" + wordToBuild.substr(rbox.pickRandom(),1).toUpperCase() + "</p></li>" );
-	}	
+		shuffledWord += wordToBuild.substr(rbox.pickRandom(),1).toUpperCase();
+		
+		//$(letterDockID).append( "<li><p class=\"l\">" + wordToBuild.substr(rbox.pickRandom(),1).toUpperCase() + "</p></li>" );
+	}
+	
+	//rare, but possible.
+	if ( shuffledWord == wordToBuild.toUpperCase() )
+	{
+		//put the first letter to the end.
+		var shuffledWord = shuffledWord.substr( 1 );
+		shuffledWord    += wordToBuild.substr( 0 , 1 ).toUpperCase();
+	}
+	
+	//build <ul>
+	for ( var j = 0; j < wordToBuild.length; j++ )
+	{
+		$(letterDockID).append( "<li><p class=\"l\">" + shuffledWord.substr( j, 1 ).toUpperCase() + "</p></li>" );
+	}
 	
 }
 

@@ -35,35 +35,57 @@ var PLAYER_H = 80;
 var DISTANCE_2_MOVE_X = 20;
 var DISTANCE_2_MOVE_Y = 20;
 
-//action: "moveClient" - "buildBlock" - "aimTarget"
-var mouseDown = {};
+//create mouseDown object.
+var mouseDown      = {};
 
 //flag (client moving / not moving)
 var movingClient = false;
 
 //gfx ref here
-var dragLine;
+var dragLine = {};
+
+//word chain selector blocks array
+var chainSelector = [];
 
 //me --> player()
 var ME;
 
+//quick reference to my svg avatar
+var avatar;
+
 //tooltips
 var gameTooltips = new tooltips();
+
+//points engine
+var gamePoints = new pointsEngine();
+
+//dictionary (call Wordreference API to check words)
+var myDictionary = new dictionary();
+
+//word chains
+var chains = new wordChains();
+
 
 function clearDragLine()
 {
 	if ( dragLine != undefined && dragLine != null )
 	{
-		try
-		{
-		  svg.remove( dragLine );
-		}
-		catch(err)
-		{
-		  //Handle errors here
-		}
+		svg.change( dragLine, { x1: 0, 
+			                    y1: 0,
+			                    x2: 0,
+			                    y2: 0 } );
 		
 	} 
+}
+
+function gameOver()
+{
+	if ( MODE == "mp" )
+	{
+		socket_disconnect();
+	}
+	
+	window.location = "gameover.html";
 }
 
 var rIDBuilder = new IDBuilder();
@@ -73,7 +95,7 @@ $(function()
 	//listeners
 	$('#eventDispatcher').bind('quizOver', function() 
 	{
-		alert('quiz is over.');
+		gameOver();
 	});
 	
 	$('#eventDispatcher').bind('questionTimeUp', function() 
@@ -82,17 +104,31 @@ $(function()
 		setDockQuestion();
 	});
 	
+	$('#eventDispatcher').bind('dictionary_api_ondata', function( event, params ) 
+	{
+		console.log( params.word + ": " + params.isWord );
+		
+		if ( params.isWord )
+		{
+			//add and render chain
+			chains.add( temp.wordChain, "" );
+			
+			//assign points
+			gamePoints.assignPoints( 'wordChain', { word:params.word } );
+		}
+		else
+		{
+			console.log( params.word + " is not a word." );
+		}
+	});
+	
 	$('#eventDispatcher').bind('wordIsCorrect', function() 
 	{	
+		//push ammo into the upper dock.
 		pushAmmo( lib[currentLibID].label.toUpperCase() );
 		
-		//alert("update here the wordcorrect function, we are not assigining points.");
-		//update my user status
-		/*
-		me.answers.push( { correct:true, time:0, libID:currentLibID });
-		me.score       += 100;
-		me.letterAmmo  += lib[currentLibID].label.toUpperCase();
-		*/
+		//assign points
+		gamePoints.assignPoints( 'wordIsCorrect', { word:lib[currentLibID].label } );
 		
 		//clear dock
 		clearDockWord();
@@ -129,6 +165,8 @@ $(function()
 		
 		//start dock
 		startDock();
+		
+		$.jGrowl("Welcome online, " + temp.name + " !" );
 	}
 	//register event listener. Once we got our client connected
 	//we will call mpStart() function
@@ -149,14 +187,6 @@ $(function()
 		//local single player testing here
 		var client = buildClient( clientID, 5, 5, ME.color, ME.name, ME.score );
 		
-		/*
-		buildBlock( 2, 2, clientID );
-		buildBlock( 14, 8, clientID );
-		buildBlock( 14, 8, clientID );
-		buildBlock( 18, 8, clientID );
-		buildPlayer( "dude1", 10, 7 );
-		*/
-		
 		//start dock
 		startDock();
 	}		
@@ -169,6 +199,9 @@ $(function()
 
 		//assign svg area
 		svg = $('#viewport').svg('get');
+		
+		//define drag line
+		dragLine = svg.line( null, 0, 0, 0, 0, {fill: 'none', stroke: '#AAAAAA', strokeWidth:1 } );
 		
 		//single player / multiplayer switch
 		if ( MODE == "mp" )

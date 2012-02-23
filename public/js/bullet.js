@@ -34,7 +34,7 @@ function bullet( playerid, degrees )
 			
 			this.destroy();
 			
-			computeBulletDamage( info.hitTargets[0] );
+			computeBulletDamage( this.playerid, info.hitTargets[0] );
 		}
 		else
 		{

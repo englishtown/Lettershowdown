@@ -26,7 +26,7 @@ function initGameViewPort()
 		//render already connected users and blocks.
 		for ( var i = 0; i < params.items.length; i++ )
 		{
-			console.log( "item type: " + params.items[i].type );
+			console.log( "building item type: " + params.items[i].type );
 			
 			if ( params.items[i].type == "player" )
 			{
@@ -36,15 +36,26 @@ function initGameViewPort()
 							 params.items[i].color,
 							 params.items[i].name,
 							 params.items[i].score );
+							 
+				$.jGrowl( params.items[i].name + " is online" );
 			}
 			else if ( params.items[i].type == "block" )
 			{
 				//create a barricade block
 				buildBlock( getTileX( params.items[i].xpos ), 
-				            getTileY( params.items[i].ypos ), 
+				            getTileY( params.items[i].ypos ),
+				            params.items[i].txt, 
 				            getBlockOwnerID( params.items[i].id ), 
 				            params.items[i].id );
 			}
+		}
+		
+		//render already created word chains
+		for ( var i = 0; i < params.chains.length; i++ )
+		{
+			console.log( "building wordChain ID: " + params.chains[i].id );
+			chains.add( params.chains[i].wordChain, 
+				        params.chains[i].id );
 		}
 		
 		//generate spawn point
@@ -72,6 +83,22 @@ function initGameViewPort()
 				     params.Item.color,
 					 params.Item.name,
 					 params.Item.score );
+					 
+		$.jGrowl( params.Item.name + " is online" );
+	});
+	
+	//a user needs a points update.
+	$('#eventDispatcher').bind('socket_user_points_update', function( event, params ) 
+	{
+		//get this user array N
+		var thisUserID = getItemNById(params.id);
+		
+		//update tooltip score
+		var myTooltip = gameTooltips.get( params.id );
+		myTooltip.updateScore( params.score );
+		
+		//update score into array
+		items[thisUserID].score = params.score;
 	});
 	
 	//on user x avatar interaction
@@ -108,8 +135,15 @@ function initGameViewPort()
 			case "drop_block":
 				//create a barricade block
 				buildBlock( getTileX( params.xpos ), 
-				            getTileY( params.ypos ), 
+				            getTileY( params.ypos ),
+				            params.txt, 
 				            getBlockOwnerID( params.id ), 
+				            params.id );
+			break;
+			
+			case "add_chain":
+				//create a word chain
+				chains.add( params.wordChain, 
 				            params.id );
 			break;
 		}
@@ -118,11 +152,22 @@ function initGameViewPort()
 	//a user left the game. lets remove him from the viewport
 	$('#eventDispatcher').bind('socket_user_disconnect', function( event, params ) 
 	{
+		//get this user array N
+		var thisUserN = getItemNById(params.id);
+		$.jGrowl( items[thisUserN].name + " is offline" );
+		
+		//remove player tooltip
+		gameTooltips.remove( params.id );
+		
 		//remove player from viewport
 		removePlayer( params.id );
 		
 		//remove all blocks related to this player.
 		destroyAllPlayerBlocks( params.id );
+		
+		//remove all chains related to this player
+		chains.removeAllPlayerChains( params.id );
+		
 	});
 
 }
@@ -135,19 +180,18 @@ function tick()
 	}
 		
 	else if ( mouseDown.action == "moveClient" )
-	{
+	{	
 		//if our client is already processing an animation, let's ignore further animation requests.
 		if ( ! movingClient )
 		{
 			var viewportTop    = $('#viewport').offset().top;
 			var viewportLeft   = $('#viewport').offset().left;
 	
-			
 			var mousex = temp.mousex - viewportLeft;
 			var mousey = temp.mousey - viewportTop;
 		
-			var relx = mousex - mouseDown.startx;
-			var rely = mousey - mouseDown.starty;
+			var relx = mousex - ( avatar.x.baseVal.value + ( PLAYER_W / 2 ) );
+			var rely = mousey - ( avatar.y.baseVal.value + ( PLAYER_H / 2 ) );
 			
 			var theta = Math.atan2(-rely, relx);
 			
@@ -155,12 +199,17 @@ function tick()
 			var clientN = getItemNById( clientID );
 			
 			//redraw drag line
+			svg.change( dragLine, { x1: items[clientN].xpos + ( PLAYER_W / 2 ), 
+			                        y1: items[clientN].ypos + ( PLAYER_H / 2 ),
+			                        x2: mousex,
+			                        y2: mousey } );
+			/*
 			clearDragLine();
 			dragLine = svg.line( items[clientN].xpos + ( PLAYER_W / 2 ), 
 								 items[clientN].ypos + ( PLAYER_H / 2 ), 
 								 mousex, 
 								 mousey,
-								 {fill: 'none', stroke: '#000000', strokeWidth:1 });
+								 {fill: 'none', stroke: '#000000', strokeWidth:1 });*/
 			
 			if (theta < 0)
 			{
@@ -198,9 +247,8 @@ function tick()
 			}
 			
 			//is distance enough to trigger a movement?
-			var relx = Math.abs( relx );
-			var rely = Math.abs( rely );
-			//console.log("relx: " + relx);
+			relx = Math.abs( relx );
+			rely = Math.abs( rely );
 			
 			if ( relx >= DISTANCE_2_MOVE_X || rely >= DISTANCE_2_MOVE_Y )
 			{	
@@ -253,8 +301,7 @@ function tick()
 				{
 					//ok, move client
 					movingClient = true;
-					
-					console.log( "moving to the " + direction );
+					console.log( "moving avatar to the " + direction );
 					
 					//register current mouse x and y, we need to replace 
 					//mouseDown startx / starty after every avatar animation is complete
@@ -297,9 +344,13 @@ function tick()
 				}
 				else
 				{
-					console.log( "Can't move, object collision." );
+					//console.log( "Can't move, object collision." );
 				}
 				
+			}
+			else
+			{
+				//console.log("not distant enough to move.");
 			}
 
 			//-----------------------------------

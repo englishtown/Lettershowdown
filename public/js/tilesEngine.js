@@ -14,6 +14,33 @@ function getTileY( ypos )
 	return Math.floor( ypos / TILE_H );
 }
 
+function blockProximityCheck( blockA, blockB )
+{
+	var proxInfo       = {};
+	proxInfo.proximity = false;
+	
+	var blockXTiles = BLOCK_W / TILE_W;
+	var	blockYTiles = BLOCK_W / TILE_W;
+	
+	
+	if ( blockA.tilex ==  blockB.tilex - blockXTiles || blockA.tilex ==  blockB.tilex + blockXTiles || blockA.tilex ==  blockB.tilex )
+	{
+		if ( blockA.tiley ==  blockB.tiley - blockYTiles || blockA.tiley ==  blockB.tiley + blockYTiles || blockA.tiley ==  blockB.tiley )
+		{
+			//of course we cannot accept to check the same tile!
+			if ( blockA.tilex ==  blockB.tilex && blockA.tiley ==  blockB.tiley)
+			{
+				proxInfo.proximity = false;
+			}
+			else
+			{
+				proxInfo.proximity = true;
+			}
+		}
+	}
+	return proxInfo;
+}
+
 //check if tile [x,y] is empty or not
 function checkTileIfEmpty( xtile, ytile )
 {

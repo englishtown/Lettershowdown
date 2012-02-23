@@ -6,6 +6,7 @@ var path     = require('path');
 var app      = require('http').createServer( handleHttpReq );
 var io       = require('socket.io').listen(app);
 
+//Heroku socket workaround. (long polling mode)
 io.configure(function () 
 { 
   io.set("transports", ["xhr-polling"]); 
@@ -20,7 +21,10 @@ var express  = require('express');
 var PORT = process.env.PORT || 3000;
 
 //items list (server copy). Every client has an identical copy.
-var items = [];
+var items  = [];
+
+//word chains
+var wordChains = [];
 
 //disable io.socket logs
 io.disable('log');
@@ -70,8 +74,8 @@ io.sockets.on('connection', function (socket)
 	var myColor = generateRandomColor();
 	
 	//notify your client that you are connected, 
-	//and send a list of already connected users and already created items
-	socket.emit('message', { sEvent:"connection", mySID:socket.id, items:items, color:myColor });
+	//and send a list of already connected users, already created items, already created word chains.
+	socket.emit('message', { sEvent:"connection", mySID:socket.id, items:items, color:myColor, chains:wordChains });
 	
 	//notify all the other users that a user has joined the game. ALL VIEWPORT RELATED INFO ARE SENT BY USER_SPAWN.
 	socket.broadcast.emit('message', { sEvent:"user_connect", sID:socket.id });
@@ -96,18 +100,24 @@ io.sockets.on('connection', function (socket)
 			var usern    = findItemByID( socket.id );
 			items[usern] = data.Item;
 			
-			//console.log( "-----> add info to this user. array #" + usern );
-			//console.log( "-----> " + items[usern].id );
-			//console.log( "-----> " + items[usern].xpos );
-			//console.log( "-----> " + items[usern].ypos );
-			//console.log( "-----> " + items[usern].type );
-			
 			//lets modify the event to look like a "user_spawn" socket event
 			//this is just a semantic thing since i dont want to merge 
 			//the client_spawn and user_spawn events.
 			data.sEvent = "user_spawn";
 			
 			//broadcast to all the users this client position.
+			socket.broadcast.emit( 'message', data );
+		}
+		
+		//a user gain / lose points
+		else if ( data.sEvent == "client_points_update" )
+		{
+			//update server item array
+			var usern = findItemByID( socket.id );
+			items[usern].score = data.score;
+				
+			//broadcast to all the users this client position.
+			data.sEvent = "user_points_update";
 			socket.broadcast.emit( 'message', data );
 		}
 		
@@ -132,6 +142,7 @@ io.sockets.on('connection', function (socket)
 				console.log("xpos:  " + data.xpos );
 				console.log("ypos:  " + data.ypos );
 				console.log("tiles: " + data.tiles.length );
+				console.log("txt:   " + data.txt );
 				
 				//push block item
 				items.push( { id:data.id,
@@ -139,7 +150,21 @@ io.sockets.on('connection', function (socket)
 							  xpos:data.xpos,
 							  ypos:data.ypos,
 							  tiles:data.tiles,
-							  color:data.color } );
+							  color:data.color,
+							  txt:data.txt } );
+				
+			}
+			else if ( data.interaction == "add_chain" )
+			{
+				console.log("--------------------------------");
+				console.log("add new word chain.");
+				console.log("--------------------------------");
+				console.log("chain id: " + data.id );
+				console.log("length:   " + data.wordChain.length );
+				
+				//push block item
+				wordChains.push( { id:data.id,
+							       wordChain:data.wordChain } );
 				
 			}
 			
@@ -165,6 +190,20 @@ io.sockets.on('connection', function (socket)
 				}
 			}
 			
+			else if ( data.interaction == "remove_chain" )
+			{
+				var chainN = findChainByID( data.id );
+				
+				if ( chainN != - 1 )
+				{
+					wordChains.splice( chainN, 1 );
+				}
+				else
+				{
+					console.log("*Warning* chain id " + data.id + " not found.");
+				}
+			}
+			
 			//if broadcast is true, broadcast to all connected clients. if not, its a private call by a certain user.
 			if ( data.broadcast )
 			{
@@ -185,6 +224,7 @@ io.sockets.on('connection', function (socket)
 		
 		var usern = findItemByID( socket.id );
 		
+		//remove this user
 		if ( usern != -1 )
 		{
 			//remove from users array
@@ -197,12 +237,18 @@ io.sockets.on('connection', function (socket)
 		
 		//remove all blocks related to this user.
 		var blockIDS = getBlockIDSByOwner( socket.id );
-		
-		//splice blocks from items array, ids top to bottom
 		for ( var j = (blockIDS.length - 1); j >= 0; j-- )
 		{
 			console.log("removing related block id: " + items[ blockIDS[j] ].id );
 			items.splice( blockIDS[j], 1 );
+		}
+		
+		//remove all wordChains related to this user.
+		var chainIDS = getWordChainIDSByOwner( socket.id );
+		for ( var j = (chainIDS.length - 1); j >= 0; j-- )
+		{
+			console.log("removing related wordChain #" + chainIDS[j] );
+			wordChains.splice( chainIDS[j], 1 );
 		}
 		
 		//notify all the other users that this user left the game.
@@ -229,12 +275,40 @@ function findItemByID( id )
 	}
 	return itemn;
 }
+//find chain by id (return array #)
+function findChainByID( id )
+{
+	var chainN = -1;
+	for ( var i = 0; i < wordChains.length; i++ )
+	{
+		if ( id == wordChains[i].id )
+		{
+			chainN = i;
+			break;
+		}
+	}
+	return chainN;
+}
 
 //generate a random distinctice color for every user
 function generateRandomColor()
 {
     var rint = Math.round(0xffffff * Math.random());
 	return ('#0' + rint.toString(16)).replace(/^#0([0-9a-f]{6})$/i, '#$1');
+}
+
+function getWordChainIDSByOwner( ownerID )
+{
+	var chainIDS = [];
+	for ( var i = 0; i < wordChains.length; i++ )
+	{
+		if ( ownerID == getChainOwnerID( wordChains[i].id ) )
+		{
+			//owner match.
+			chainIDS.push( i );
+		}
+	}
+	return chainIDS;
 }
 
 function getBlockIDSByOwner( ownerID )
@@ -258,5 +332,10 @@ function getBlockIDSByOwner( ownerID )
 function getBlockOwnerID( blockID )
 {
 	var ownerID = blockID.toString().split( "_" )[2];
+	return ownerID;
+}
+function getChainOwnerID( chainID )
+{
+	var ownerID = chainID.toString().split( "_" )[2];
 	return ownerID;
 }

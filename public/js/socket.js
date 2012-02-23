@@ -51,6 +51,12 @@ function socket_connect()
 			$('#eventDispatcher').trigger( 'socket_user_avatar_interaction', data );
 		}
 		
+		//triggered on user points update
+		else if ( data.sEvent == "user_points_update" )
+		{
+			$('#eventDispatcher').trigger( 'socket_user_points_update', data );
+		}
+		
 		//triggered on other user game viewport interaction
 		else if ( data.sEvent == "user_server_action" )
 		{
@@ -63,6 +69,11 @@ function socket_connect()
 			$('#eventDispatcher').trigger( 'socket_user_disconnect', data );
 		}
 	});
+}
+
+function socket_disconnect() 
+{
+	socket.disconnect();
 }
 
 function socket_client_spawn( data ) 
@@ -80,6 +91,12 @@ function socket_client_avatar_interaction( data )
 function socket_client_server_action( data ) 
 {
 	data.sEvent = "client_server_action";
+	socket.emit( 'message', data );
+}
+
+function socket_interaction( sEvent, data )
+{
+	data.sEvent = sEvent;
 	socket.emit( 'message', data );
 }
 

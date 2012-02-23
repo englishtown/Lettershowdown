@@ -2,7 +2,7 @@
 var quizSingleAnswerTime = 30000;
 
 //quiz total questions
-var quizTotalQuestions = lib.length;
+var quizTotalQuestions = 10; //lib.length;
 
 //quiz total answers count
 var quizAnswerCount  = 0;
@@ -18,6 +18,7 @@ function startQuiz()
 {
 	quizClockTimer = setInterval( quizTimeCheck, 1000 );
 	updatequizClock();
+	updateAnswerCounter();
 }
 
 function quizTimeCheck()
@@ -30,8 +31,7 @@ function quizTimeCheck()
 		if ( quizAnswerCount >= ( quizTotalQuestions - 1 ) )
 		{
 			clearInterval ( quizClockTimer );
-			
-			$('#eventDispatcher').trigger('GAME OVER! Refresh this page to play again.');
+			$('#eventDispatcher').trigger('quizOver');
 		}
 		else
 		{
@@ -42,6 +42,9 @@ function quizTimeCheck()
 		
 		//update answer counter
 		quizAnswerCount++;
+		
+		//update answer counter
+		updateAnswerCounter();
 	}
 	
 	//or keep on going with the clock
@@ -53,8 +56,13 @@ function quizTimeCheck()
 	updatequizClock();
 }
 
+function updateAnswerCounter()
+{
+	$( "#answer" ).html( quizAnswerCount + " / " + quizTotalQuestions );
+}
+
 function updatequizClock()
 {
 	var remainingAnswerTime = ( quizSingleAnswerTime - quizQuestionTimePassed ) / 1000;
-	$("#clock").html( "0:" + ( remainingAnswerTime < 10 ? "0" : "" ) + remainingAnswerTime );
+	$("#clock").html( "00:" + ( remainingAnswerTime < 10 ? "0" : "" ) + remainingAnswerTime );
 }
